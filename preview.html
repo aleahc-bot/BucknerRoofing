@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buckner Roofing — device preview</title>
+<style>
+  /* ============================================================
+     DEVICE PREVIEW HARNESS
+     This is a BUILD TOOL, not part of the website. It loads the real
+     pages inside an iframe set to a true device viewport width, so what
+     you see is the actual rendered site — not a mockup.
+     Delete preview.html before handing the site to the client.
+     ============================================================ */
+  * { box-sizing: border-box; }
+  :root {
+    --bg: #0f1115;
+    --panel: #171a20;
+    --line: #2a2f38;
+    --text: #e9edf2;
+    --muted: #98a2b0;
+    --orange: #ff5307;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    flex: none;
+    flex-wrap: wrap;
+  }
+  .brand { font-weight: 700; letter-spacing: 0.02em; }
+  .brand span { color: var(--orange); }
+  select, .zoom {
+    background: #0f1216;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.45rem 0.6rem;
+    font: inherit;
+  }
+  .readout { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .readout b { color: var(--text); font-weight: 600; }
+
+  main {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    overflow: auto;
+    padding: 1.5rem;
+  }
+
+  /* the device shell scales as a whole so the iframe keeps its TRUE pixel width */
+  .stage { transform-origin: top center; }
+  .device {
+    background: #0a0c0f;
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    padding: 14px;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.8);
+    position: relative;
+  }
+  .device[data-kind="desktop"] { border-radius: 12px; padding: 10px 10px 26px; }
+  .device[data-kind="desktop"]::after {
+    content: "";
+    position: absolute;
+    left: 50%; bottom: 9px; transform: translateX(-50%);
+    width: 70px; height: 4px; border-radius: 2px; background: #2c323c;
+  }
+  .notch {
+    height: 18px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 6px;
+  }
+  .notch::before {
+    content: "";
+    width: 54px; height: 5px; border-radius: 3px; background: #2c323c;
+  }
+  .device[data-kind="desktop"] .notch { display: none; }
+  iframe {
+    display: block;
+    border: 0;
+    background: #fff;
+    border-radius: 12px;
+  }
+  .device[data-kind="desktop"] iframe { border-radius: 6px; }
+
+  /* floating side rail */
+  .rail {
+    position: fixed;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 20px 45px -20px rgba(0,0,0,0.9);
+    z-index: 50;
+  }
+  .rail button {
+    width: 52px; height: 52px;
+    display: grid; place-items: center; gap: 2px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid transparent;
+    border-radius: 11px;
+    cursor: pointer;
+    font: 600 9px/1 ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: all 0.18s ease;
+  }
+  .rail button svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .rail button:hover { color: var(--text); background: #1e222a; }
+  .rail button[aria-pressed="true"] {
+    color: #fff;
+    background: var(--orange);
+    border-color: var(--orange);
+  }
+  .rail hr { border: 0; border-top: 1px solid var(--line); margin: 2px 4px; }
+  .rot { font-size: 9px; }
+  @media (max-width: 820px) {
+    .rail { right: 8px; }
+    main { padding: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Buckner <span>preview</span></div>
+  <select id="page">
+    <option value="index.html">Home</option>
+    <option value="services.html">Services</option>
+    <option value="projects.html">Projects</option>
+    <option value="about.html">About</option>
+    <option value="contact.html">Contact</option>
+  </select>
+  <select id="device">
+    <optgroup label="Mobile">
+      <option value="360x800|mobile">Android 360 × 800</option>
+      <option value="390x844|mobile" selected>iPhone 14/15 390 × 844</option>
+      <option value="393x852|mobile">Pixel 8 393 × 852</option>
+      <option value="430x932|mobile">iPhone Pro Max 430 × 932</option>
+    </optgroup>
+    <optgroup label="Tablet">
+      <option value="768x1024|tablet">iPad Mini 768 × 1024</option>
+      <option value="820x1180|tablet">iPad Air 820 × 1180</option>
+      <option value="1024x1366|tablet">iPad Pro 1024 × 1366</option>
+    </optgroup>
+    <optgroup label="Desktop">
+      <option value="1280x800|desktop">Laptop 1280 × 800</option>
+      <option value="1440x900|desktop">Desktop 1440 × 900</option>
+      <option value="1920x1080|desktop">Full HD 1920 × 1080</option>
+    </optgroup>
+  </select>
+  <select id="zoom" class="zoom">
+    <option value="fit" selected>Zoom: fit</option>
+    <option value="1">100%</option>
+    <option value="0.75">75%</option>
+    <option value="0.5">50%</option>
+  </select>
+  <div class="readout">viewport <b id="vp">390 × 844</b> · scale <b id="sc">100%</b></div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+    <div class="device" id="device" data-kind="mobile">
+      <div class="notch"></div>
+      <iframe id="frame" src="index.html" title="Site preview"></iframe>
+    </div>
+  </div>
+</main>
+
+<nav class="rail" aria-label="Device size">
+  <button data-set="390x844|mobile" aria-pressed="true">
+    <svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18.5h2"/></svg>
+    Mobile
+  </button>
+  <button data-set="820x1180|tablet" aria-pressed="false">
+    <svg viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="2"/><path d="M10.5 18.8h3"/></svg>
+    Tablet
+  </button>
+  <button data-set="1440x900|desktop" aria-pressed="false">
+    <svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M9 20.5h6M12 17.2v3.3"/></svg>
+    Desktop
+  </button>
+  <hr>
+  <button id="rotate" class="rot" aria-pressed="false" title="Rotate">
+    <svg viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 0 1 14.5-6"/><path d="M18.5 3v3.5H15"/><path d="M20.5 12a8.5 8.5 0 0 1-14.5 6"/><path d="M5.5 21v-3.5H9"/></svg>
+    Rotate
+  </button>
+</nav>
+
+<script>
+(function () {
+  "use strict";
+  var frame  = document.getElementById("frame");
+  var device = document.getElementById("device");
+  var stage  = document.getElementById("stage");
+  var sel    = document.getElementById("device");
+  var pageSel= document.getElementById("page");
+  var zoomSel= document.getElementById("zoom");
+  var vpOut  = document.getElementById("vp");
+  var scOut  = document.getElementById("sc");
+  var rail   = document.querySelectorAll(".rail button[data-set]");
+  var rotateBtn = document.getElementById("rotate");
+
+  var w = 390, h = 844, kind = "mobile", landscape = false;
+
+  /* open on whichever page the launcher was clicked from */
+  var wanted = new URLSearchParams(window.location.search).get("p");
+  if (wanted && [...pageSel.options].some(function (o) { return o.value === wanted; })) {
+    pageSel.value = wanted;
+    frame.src = wanted;
+  }
+
+  function apply() {
+    var vw = landscape ? h : w;
+    var vh = landscape ? w : h;
+
+    /* The iframe gets the TRUE device pixel width. That is what makes this
+       accurate: the site inside runs its real media queries at this width. */
+    frame.style.width  = vw + "px";
+    frame.style.height = vh + "px";
+    device.dataset.kind = kind;
+
+    /* Scale the whole shell down only to fit the screen — the iframe still
+       believes it is vw wide, so nothing about the layout is faked. */
+    var main = document.querySelector("main");
+    var availW = main.clientWidth  - 48;
+    var availH = main.clientHeight - 48;
+    var shellW = vw + 28;
+    var shellH = vh + 28 + (kind === "desktop" ? 24 : 24);
+
+    var scale = 1;
+    if (zoomSel.value === "fit") {
+      scale = Math.min(availW / shellW, availH / shellH, 1);
+    } else {
+      scale = parseFloat(zoomSel.value);
+    }
+    stage.style.transform = "scale(" + scale + ")";
+
+    vpOut.textContent = vw + " × " + vh;
+    scOut.textContent = Math.round(scale * 100) + "%";
+  }
+
+  function set(value) {
+    var parts = value.split("|");
+    var dims = parts[0].split("x");
+    w = parseInt(dims[0], 10);
+    h = parseInt(dims[1], 10);
+    kind = parts[1];
+    landscape = false;
+    rotateBtn.setAttribute("aria-pressed", "false");
+    apply();
+  }
+
+  sel.addEventListener("change", function () {
+    set(sel.value);
+    rail.forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.set === sel.value));
+    });
+  });
+
+  rail.forEach(function (b) {
+    b.addEventListener("click", function () {
+      rail.forEach(function (o) { o.setAttribute("aria-pressed", "false"); });
+      b.setAttribute("aria-pressed", "true");
+      sel.value = b.dataset.set;
+      set(b.dataset.set);
+    });
+  });
+
+  rotateBtn.addEventListener("click", function () {
+    if (kind === "desktop") return;
+    landscape = !landscape;
+    rotateBtn.setAttribute("aria-pressed", String(landscape));
+    apply();
+  });
+
+  pageSel.addEventListener("change", function () { frame.src = pageSel.value; });
+  zoomSel.addEventListener("change", apply);
+  window.addEventListener("resize", apply);
+
+  apply();
+})();
+</script>
+</body>
+</html>
